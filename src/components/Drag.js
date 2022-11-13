@@ -37,7 +37,7 @@ const Drag = () => {
 					style={{ transform: `translateX(${x}px) translateY(${y}px)` }}
 					// 드레그 이벤트트
 					{...registerDragEvent({
-						onDragEvent: (moveX, moveY) => {
+						onDragStart: (moveX, moveY) => {
 							onBoundaryDragEvent(moveX, moveY);
 						},
 					})}

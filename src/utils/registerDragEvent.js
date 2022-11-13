@@ -3,7 +3,7 @@ const isTouchScreen =
 	typeof window !== 'undefined' &&
 	window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-const registerDragEvent = ({ onDragEvent, stopPropagation }) => {
+const registerDragEvent = ({ onDragStart, onDragEnd, stopPropagation }) => {
 	if (isTouchScreen) {
 		return {
 			onTouchStart: (touchEvent) => {
@@ -15,9 +15,12 @@ const registerDragEvent = ({ onDragEvent, stopPropagation }) => {
 				const touchMoveHandler = (moveEvent) => {
 					const moveX = moveEvent.touches[0].pageX - initX;
 					const moveY = moveEvent.touches[0].pageY - initY;
-					onDragEvent(moveX, moveY);
+					onDragStart(moveX, moveY);
 				};
-				const touchEndHandler = () => {
+				const touchEndHandler = (moveEvent) => {
+					const moveX = moveEvent.touches[0].pageX - initX;
+					const moveY = moveEvent.touches[0].pageY - initY;
+					onDragEnd(moveX, moveY);
 					document.removeEventListener('touchmove', touchMoveHandler);
 				};
 
@@ -39,10 +42,13 @@ const registerDragEvent = ({ onDragEvent, stopPropagation }) => {
 			const mouseMoveHandler = (moveEvent) => {
 				const moveX = moveEvent.pageX - initX;
 				const moveY = moveEvent.pageY - initY;
-				onDragEvent(moveX, moveY);
+				onDragStart(moveX, moveY);
 			};
 
-			const mouseUpHandler = () => {
+			const mouseUpHandler = (moveEvent) => {
+				const moveX = moveEvent.pageX - initX;
+				const moveY = moveEvent.pageY - initY;
+				onDragEnd(moveX, moveY);
 				document.removeEventListener('mousemove', mouseMoveHandler);
 			};
 

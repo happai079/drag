@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { inrange } from '../utils';
+import registerDragEvent from './../utils/registerDragEvent';
 
 const SLIDER_WIDTH = 400;
 const SLIDER_HEIGHT = 400;
@@ -23,11 +25,27 @@ const Carousel = () => {
 				<Slider
 					style={{
 						transform: `translateX(${-currentIndex * SLIDER_WIDTH + transX}px)`,
+						transition: `transform ${transX ? 0 : 300}ms ease-in-out 0s`,
 					}}
+					// 드레그 이벤트
+					{...registerDragEvent({
+						onDragStart: (moveX) => {
+							setTransX(inrange(moveX, -SLIDER_WIDTH, SLIDER_WIDTH));
+						},
+						onDragEnd: (moveX) => {
+							const maxIndex = imageList.length - 1;
+
+							if (moveX < -100)
+								setCurrentIndex(inrange(currentIndex + 1, 0, maxIndex));
+							if (moveX > 100) setCurrentIndex(inrange(currentIndex - 1, 0, maxIndex));
+
+							setTransX(0);
+						},
+					})}
 				>
 					{imageList.map((url, idx) => (
 						<Slide key={idx}>
-							<SlideImage src={url} alt="img" />
+							<SlideImage src={url} alt="img" draggable={false} />
 						</Slide>
 					))}
 				</Slider>
