@@ -52,7 +52,8 @@ const DragBox = styled.div`
 	justify-content: center;
 	align-items: center;
 	width: 100%;
-	height: 300px;
+	max-width: 700px;
+	height: 400px;
 	background-color: lightgray;
 	border-radius: 10px;
 `;
