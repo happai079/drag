@@ -16,7 +16,7 @@ function App() {
 					ref={boxRef}
 					// 이동한 거리만큼 translate
 					style={{ transform: `translateX(${x}px) translateY(${y}px)` }}
-					// mousedown - 마우스 클릭 이벤트
+					// 마우스 클릭 이벤트
 					onMouseDown={(clickEvnet) => {
 						const initX = clickEvnet.pageX;
 						const initY = clickEvnet.pageY;
@@ -50,10 +50,23 @@ function App() {
 							document.removeEventListener('mousemove', mouseMoveHandler);
 						};
 
-						// mousemove - 마우스 이동 이벤트
 						document.addEventListener('mousemove', mouseMoveHandler);
-						// mouseup - 마우스 클릭 해제 이벤트
 						document.addEventListener('mouseup', mouseUpHandler, { once: true });
+					}}
+					// 모바일 터치 이벤트
+					onTouchStart={(touchEvent) => {
+						const touchMoveHandler = (moveEvent) => {
+							setPosition({
+								x: moveEvent.touches[0].pageX - touchEvent.touches[0].pageX,
+								y: moveEvent.touches[0].pageY - touchEvent.touches[0].pageY,
+							});
+						};
+						const touchEndHandler = () => {
+							document.removeEventListener('touchmove', touchMoveHandler);
+						};
+
+						document.addEventListener('touchmove', touchMoveHandler);
+						document.addEventListener('touchend', touchEndHandler, { once: true });
 					}}
 				/>
 			</DragBox>
