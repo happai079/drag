@@ -49,6 +49,13 @@ const Carousel = () => {
 						</Slide>
 					))}
 				</Slider>
+				<Bullets>
+					{imageList.map((url, idx) => (
+						<span key={idx} className={currentIndex === idx ? 'current' : ''}>
+							●
+						</span>
+					))}
+				</Bullets>
 			</Viewer>
 		</div>
 	);
@@ -56,7 +63,7 @@ const Carousel = () => {
 
 const Viewer = styled.div`
 	width: ${SLIDER_WIDTH}px;
-	height: ${SLIDER_HEIGHT}px;
+	height: ${SLIDER_HEIGHT + 30}px;
 	overflow: hidden;
 `;
 
@@ -71,6 +78,22 @@ const Slide = styled.div`
 const SlideImage = styled.img`
 	width: ${SLIDER_WIDTH}px;
 	cursor: pointer;
+`;
+
+const Bullets = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	span {
+		font-size: 15px;
+		margin: 0 5px;
+		color: lightgray;
+
+		&.current {
+			color: black;
+		}
+	}
 `;
 
 export default Carousel;
