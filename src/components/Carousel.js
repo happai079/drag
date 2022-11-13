@@ -14,9 +14,13 @@ const imageList = [
 	'https://blog.kakaocdn.net/dn/bG3iVL/btqUvCZPaRL/ofIjkNWJP1mj2bOG9fie51/img.jpg',
 ];
 
+// 무한 캐러셀
+const slideList = [imageList.at(-1), ...imageList, imageList.at(0)];
+
 const Carousel = () => {
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(1);
 	const [transX, setTransX] = useState(0);
+	const [animate, setAnimate] = useState(false);
 
 	return (
 		<div>
@@ -25,7 +29,7 @@ const Carousel = () => {
 				<Slider
 					style={{
 						transform: `translateX(${-currentIndex * SLIDER_WIDTH + transX}px)`,
-						transition: `transform ${transX ? 0 : 300}ms ease-in-out 0s`,
+						transition: `transform ${animate ? 300 : 0}ms ease-in-out 0s`,
 					}}
 					// 드레그 이벤트
 					{...registerDragEvent({
@@ -33,17 +37,28 @@ const Carousel = () => {
 							setTransX(inrange(moveX, -SLIDER_WIDTH, SLIDER_WIDTH));
 						},
 						onDragEnd: (moveX) => {
-							const maxIndex = imageList.length - 1;
+							const maxIndex = slideList.length - 1;
 
 							if (moveX < -100)
 								setCurrentIndex(inrange(currentIndex + 1, 0, maxIndex));
 							if (moveX > 100) setCurrentIndex(inrange(currentIndex - 1, 0, maxIndex));
 
+							setAnimate(true);
 							setTransX(0);
 						},
 					})}
+					// transition이 종료되면 animate를 끄고 currentIndex 변경
+					onTransitionEnd={() => {
+						setAnimate(false);
+
+						if (currentIndex === 0) {
+							setCurrentIndex(slideList.length - 2);
+						} else if (currentIndex === slideList.length - 1) {
+							setCurrentIndex(1);
+						}
+					}}
 				>
-					{imageList.map((url, idx) => (
+					{slideList.map((url, idx) => (
 						<Slide key={idx}>
 							<SlideImage src={url} alt="img" draggable={false} />
 						</Slide>
@@ -51,7 +66,7 @@ const Carousel = () => {
 				</Slider>
 				<Bullets>
 					{imageList.map((url, idx) => (
-						<span key={idx} className={currentIndex === idx ? 'current' : ''}>
+						<span key={idx} className={currentIndex - 1 === idx ? 'current' : ''}>
 							●
 						</span>
 					))}
