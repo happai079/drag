@@ -1,24 +1,49 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { inrange } from './utils';
 
 function App() {
+	const boundaryRef = useRef();
+	const boxRef = useRef();
+
 	const [{ x, y }, setPosition] = useState({ x: 0, y: 0 });
 
 	return (
 		<AppContainer>
 			<h1>DRAG BOX</h1>
-			<DragBox>
+			<DragBox ref={boundaryRef}>
 				<Box
+					ref={boxRef}
 					// 이동한 거리만큼 translate
 					style={{ transform: `translateX(${x}px) translateY(${y}px)` }}
 					// mousedown - 마우스 클릭 이벤트
 					onMouseDown={(clickEvnet) => {
-						const mouseMoveHandler = (moveEvent) => {
-							// 클릭시 커서 위치 기준으로 이동한 거리 계산
-							const moveX = moveEvent.pageX - clickEvnet.pageX;
-							const moveY = moveEvent.pageY - clickEvnet.pageY;
+						const initX = clickEvnet.pageX;
+						const initY = clickEvnet.pageY;
 
-							setPosition({ x: x + moveX, y: y + moveY });
+						const mouseMoveHandler = (moveEvent) => {
+							if (boundaryRef.current && boxRef.current) {
+								const boundary = boundaryRef.current.getBoundingClientRect();
+								const box = boxRef.current.getBoundingClientRect();
+								const BOUNDARY_MARGIN = 12;
+
+								// 클릭시 커서 위치 기준으로 이동한 거리 계산
+								const moveX = moveEvent.pageX - initX;
+								const moveY = moveEvent.pageY - initY;
+
+								setPosition({
+									x: inrange(
+										x + moveX,
+										Math.floor(-boundary.width / 2 + box.width / 2 + BOUNDARY_MARGIN),
+										Math.floor(boundary.width / 2 - box.width / 2 - BOUNDARY_MARGIN)
+									),
+									y: inrange(
+										y + moveY,
+										Math.floor(-boundary.height / 2 + box.height / 2 + BOUNDARY_MARGIN),
+										Math.floor(boundary.height / 2 - box.height / 2 - BOUNDARY_MARGIN)
+									),
+								});
+							}
 						};
 
 						const mouseUpHandler = () => {
