@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useRef, useState } from 'react';
 import { inrange } from './utils';
+import registerDragEvent from './utils/registerDragEvent';
 
 function App() {
 	const boundaryRef = useRef();
@@ -8,7 +9,7 @@ function App() {
 
 	const [{ x, y }, setPosition] = useState({ x: 0, y: 0 });
 
-	const onDragEvent = (moveX, moveY) => {
+	const onBoundaryDragEvent = (moveX, moveY) => {
 		const boundary = boundaryRef.current.getBoundingClientRect();
 		const box = boxRef.current.getBoundingClientRect();
 		const BOUNDARY_MARGIN = 12;
@@ -34,44 +35,12 @@ function App() {
 				<Box
 					ref={boxRef}
 					style={{ transform: `translateX(${x}px) translateY(${y}px)` }}
-					// 마우스 클릭 이벤트
-					onMouseDown={(clickEvnet) => {
-						const initX = clickEvnet.pageX;
-						const initY = clickEvnet.pageY;
-
-						const mouseMoveHandler = (moveEvent) => {
-							if (boundaryRef.current && boxRef.current) {
-								// 클릭시 커서 위치 기준으로 이동한 거리 계산
-								const moveX = moveEvent.pageX - initX;
-								const moveY = moveEvent.pageY - initY;
-								onDragEvent(moveX, moveY);
-							}
-						};
-
-						const mouseUpHandler = () => {
-							document.removeEventListener('mousemove', mouseMoveHandler);
-						};
-
-						document.addEventListener('mousemove', mouseMoveHandler);
-						document.addEventListener('mouseup', mouseUpHandler, { once: true });
-					}}
-					// 모바일 터치 이벤트
-					onTouchStart={(touchEvent) => {
-						const initX = touchEvent.touches[0].pageX;
-						const initY = touchEvent.touches[0].pageY;
-
-						const touchMoveHandler = (moveEvent) => {
-							const moveX = moveEvent.touches[0].pageX - initX;
-							const moveY = moveEvent.touches[0].pageY - initY;
-							onDragEvent(moveX, moveY);
-						};
-						const touchEndHandler = () => {
-							document.removeEventListener('touchmove', touchMoveHandler);
-						};
-
-						document.addEventListener('touchmove', touchMoveHandler);
-						document.addEventListener('touchend', touchEndHandler, { once: true });
-					}}
+					// 드레그 이벤트트
+					{...registerDragEvent({
+						onDragEvent: (moveX, moveY) => {
+							onBoundaryDragEvent(moveX, moveY);
+						},
+					})}
 				/>
 			</DragBox>
 		</AppContainer>
